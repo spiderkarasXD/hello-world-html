@@ -64,7 +64,7 @@ public final class MidiInput {
 
     private boolean isOwn(MidiDeviceInfo info) {
         Bundle p = info.getProperties();
-        Object si = p.getParcelable(MidiDeviceInfo.PROPERTY_SERVICE_INFO);
+        Object si = p.getParcelable("service_info") // MidiDeviceInfo.PROPERTY_SERVICE_INFO скрыта в SDK;
         return si instanceof ServiceInfo && ctx.getPackageName().equals(((ServiceInfo) si).packageName);
     }
 
