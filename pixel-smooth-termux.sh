@@ -5,6 +5,7 @@
 # Использование (в Termux):
 #   ./pixel-smooth-termux.sh pair      # один раз: сопряжение
 #   ./pixel-smooth-termux.sh apply|revert|status [REFRESH_HZ]
+#   ./pixel-smooth-termux.sh connect   # только подключить adb (для vibe_midi.py)
 set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -26,10 +27,13 @@ case "${1:-}" in
     read -rp "Код (6 цифр): " code
     adb pair "localhost:$port" "$code" && echo "Сопряжено. Теперь: $0 apply"
     ;;
+  connect)
+    connect && echo "Подключено. Теперь можно запускать adb-скрипты, например: python vibe_midi.py demo:tetris"
+    ;;
   apply|revert|status)
     connect
     serial="$(adb devices | awk '/localhost.*device$/ {print $1; exit}')"
     ANDROID_SERIAL="$serial" bash "$DIR/pixel-smooth.sh" "$@"
     ;;
-  *) echo "Использование: $0 pair | apply|revert|status [REFRESH_HZ]"; exit 1 ;;
+  *) echo "Использование: $0 pair | connect | apply|revert|status [REFRESH_HZ]"; exit 1 ;;
 esac

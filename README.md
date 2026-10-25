@@ -53,3 +53,34 @@ python pixel_smooth_gui.py
 
 - Батарея садится быстрее (постоянные 90/120 Гц, выключенная адаптивная батарея).
 - Fixed performance mode сбрасывается после перезагрузки — просто запустите `apply` снова.
+
+# Vibe MIDI
+
+Проигрывает MIDI на вибромоторе телефона, как Steam Controller играл музыку своими моторами. Вибромотор один, поэтому звучит одна нота за раз (верхний голос выбранных дорожек); ударные пропускаются.
+
+## Через adb (`vibe_midi.py`)
+
+```bash
+python vibe_midi.py --info               # что умеет вибромотор
+python vibe_midi.py demo:tetris          # демо: tetris, ode, scale
+python vibe_midi.py song.mid             # свой файл
+python vibe_midi.py song.mid --list      # дорожки файла
+python vibe_midi.py song.mid -t 2        # играть только дорожку 2
+python vibe_midi.py song.mid -o 1 -s 0.8 # на октаву выше, темп 80%
+```
+
+Остановить — Ctrl+C. Песня целиком загружается на телефон как shell-скрипт и играется там через `cmd vibrator_manager`, поэтому задержки adb не рвут ритм.
+
+Режимы (`-m`):
+
+- **freq** — мотору задаётся настоящая частота ноты (`waveform -f`). Звучит чище всего; нужен `FREQUENCY_CONTROL` (есть на Pixel 6 и новее, проверьте `--info`).
+- **pwm** — мотор включается и выключается с частотой ноты, как у Steam Controller. Работает на любом Android.
+- **auto** (по умолчанию) — freq, если поддерживается, иначе pwm.
+
+Без ПК: в Termux `pkg install python android-tools`, один раз `bash pixel-smooth-termux.sh pair`, затем `bash pixel-smooth-termux.sh connect` и `python vibe_midi.py demo:tetris`.
+
+Если вибрации нет: выключите «Не беспокоить» и проверьте, что вибрация включена в Настройки → Звук и вибрация → Вибрация и тактильный отклик.
+
+## В браузере (`midi-vibe.html`)
+
+Откройте файл в Chrome на Android. Работает только режим pwm (Vibration API даёт точность 1 мс), и звук грубее, чем через adb.
